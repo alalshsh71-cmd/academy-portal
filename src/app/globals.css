@@ -1,0 +1,37 @@
+:root {
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+  --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;
+  --space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;--space-12:3rem;--space-16:4rem;
+  --color-bg:#f7f6f2;--color-surface:#ffffff;--color-surface-2:#fbfbf9;
+  --color-surface-offset:#efede8;--color-border:#ddd7cf;--color-divider:#e7e1d9;
+  --color-text:#231f1a;--color-text-muted:#6f6a64;--color-text-faint:#aaa49d;
+  --color-text-inverse:#f9f8f4;--color-primary:#0b6b6f;--color-primary-hover:#09565a;
+  --color-primary-highlight:#d9ebea;--color-success:#3e7a1f;
+  --color-warning:#a15a12;--color-error:#a12c4c;
+  --radius-sm:.5rem;--radius-md:.8rem;--radius-lg:1.1rem;
+  --radius-xl:1.4rem;--radius-full:9999px;
+  --shadow-sm:0 1px 2px rgba(25,20,10,.05);
+  --shadow-md:0 8px 24px rgba(25,20,10,.08);
+  --shadow-lg:0 20px 60px rgba(25,20,10,.12);
+  --transition:180ms cubic-bezier(.16,1,.3,1);
+}
+[data-theme="dark"] {
+  --color-bg:#161513;--color-surface:#1d1c1a;--color-surface-2:#23211f;
+  --color-surface-offset:#2a2724;--color-border:#3a3733;--color-divider:#2c2926;
+  --color-text:#efeae2;--color-text-muted:#b2aba2;--color-text-faint:#7f786f;
+  --color-primary:#62a8ac;--color-primary-hover:#7dc0c3;
+  --color-primary-highlight:#233335;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.20);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:none;scroll-behavior:smooth}
+body{min-height:100dvh;font-family:'Tajawal',sans-serif;font-size:var(--text-base);
+  line-height:1.6;background:var(--color-bg);color:var(--color-text)}
+img,svg{display:block;max-width:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+:focus-visible{outline:2px solid var(--color-primary);outline-offset:3px;border-radius:var(--radius-sm)}
