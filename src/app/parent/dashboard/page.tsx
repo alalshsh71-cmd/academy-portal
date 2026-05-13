@@ -18,7 +18,6 @@ export default async function ParentDashboard() {
     .select(`
       students (
         id, full_name, student_number, grade, group_name,
-        attendance (status, date),
         grades (score, max_score, subject, exam_name, exam_date),
         warnings (title, level, is_resolved, created_at)
       )
@@ -27,7 +26,6 @@ export default async function ParentDashboard() {
 
   const students = children?.map((c: any) => c.students) ?? []
 
-  // جلب الاشتراكات من الـ View مع days_remaining الصحيح (توقيت الرياض)
   const studentIds = students.map((s: any) => s?.id).filter(Boolean)
   const { data: subsData } = studentIds.length > 0
     ? await supabase
@@ -60,42 +58,31 @@ export default async function ParentDashboard() {
 
       <div style={{ display: 'grid', gap: 'var(--space-6)' }}>
         {students.map((s: any) => {
-          // الاشتراك من الـ View مباشرة
           const activeSub = subsData?.find(
             (x: any) => x.student_id === s.id && x.computed_status !== 'expired'
           )
           const daysLeft: number | null = activeSub ? Number(activeSub.days_remaining) : null
 
-          const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Riyadh' })
-          const todayAtt    = s.attendance?.find((a: any) => a.date === todayStr)
           const openWarnings = s.warnings?.filter((w: any) => !w.is_resolved).length ?? 0
           const recentGrade = s.grades?.sort((a: any, b: any) =>
             new Date(b.exam_date).getTime() - new Date(a.exam_date).getTime())[0]
 
-          const attStyle: any = {
-            present: { color: 'var(--color-success)',  label: '✓ حاضر اليوم' },
-            absent:  { color: 'var(--color-error)',    label: '✗ غائب اليوم'  },
-            late:    { color: 'var(--color-warning)',  label: '⏱ متأخر اليوم' },
-          }
-
           const daysColor = daysLeft === null
             ? 'var(--color-text-muted)'
-            : daysLeft <= 7
-            ? 'var(--color-error)'
-            : daysLeft <= 14
-            ? 'var(--color-warning)'
+            : daysLeft <= 7  ? 'var(--color-error)'
+            : daysLeft <= 14 ? 'var(--color-warning)'
             : 'var(--color-success)'
 
           return (
             <div key={s.id} style={card}>
+
               {/* Student Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
                 marginBottom: 'var(--space-5)', paddingBottom: 'var(--space-5)',
                 borderBottom: '1px solid var(--color-divider)' }}>
                 <div>
                   <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 800 }}>{s.full_name}</h3>
-                  <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-2)',
-                    flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-2)', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>
                       رقم: <strong>{s.student_number}</strong>
                     </span>
@@ -111,28 +98,20 @@ export default async function ParentDashboard() {
                     )}
                   </div>
                 </div>
-                {todayAtt && (
-                  <span style={{ fontWeight: 700, fontSize: 'var(--text-sm)',
-                    color: (attStyle[todayAtt.status] ?? attStyle.present).color }}>
-                    {(attStyle[todayAtt.status] ?? { label: todayAtt.status }).label}
-                  </span>
-                )}
               </div>
 
               {/* Stats Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-                gap: 'var(--space-4)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 'var(--space-4)' }}>
 
                 {/* الاشتراك */}
-                <div style={{ background: 'var(--color-surface-offset)', borderRadius: 'var(--radius-lg)',
-                  padding: 'var(--space-4)' }}>
+                <div style={{ background: 'var(--color-surface-offset)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)' }}>
                   <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)',
-                    fontWeight: 700, marginBottom: 'var(--space-2)', textTransform: 'uppercase',
-                    letterSpacing: '.05em' }}>الاشتراك</div>
+                    fontWeight: 700, marginBottom: 'var(--space-2)', textTransform: 'uppercase', letterSpacing: '.05em' }}>
+                    الاشتراك
+                  </div>
                   {activeSub ? (
                     <>
-                      <div style={{ fontWeight: 800, color: daysColor,
-                        fontSize: 'var(--text-lg)', fontVariantNumeric: 'tabular-nums' }}>
+                      <div style={{ fontWeight: 800, color: daysColor, fontSize: 'var(--text-lg)', fontVariantNumeric: 'tabular-nums' }}>
                         {daysLeft} يوم
                       </div>
                       <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', marginTop: 2 }}>
@@ -145,15 +124,14 @@ export default async function ParentDashboard() {
                 </div>
 
                 {/* آخر درجة */}
-                <div style={{ background: 'var(--color-surface-offset)', borderRadius: 'var(--radius-lg)',
-                  padding: 'var(--space-4)' }}>
+                <div style={{ background: 'var(--color-surface-offset)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)' }}>
                   <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)',
-                    fontWeight: 700, marginBottom: 'var(--space-2)', textTransform: 'uppercase',
-                    letterSpacing: '.05em' }}>آخر درجة</div>
+                    fontWeight: 700, marginBottom: 'var(--space-2)', textTransform: 'uppercase', letterSpacing: '.05em' }}>
+                    آخر درجة
+                  </div>
                   {recentGrade ? (
                     <>
-                      <div style={{ fontWeight: 800, fontSize: 'var(--text-lg)',
-                        fontVariantNumeric: 'tabular-nums',
+                      <div style={{ fontWeight: 800, fontSize: 'var(--text-lg)', fontVariantNumeric: 'tabular-nums',
                         color: (recentGrade.score / recentGrade.max_score) >= 0.9
                           ? 'var(--color-success)' : (recentGrade.score / recentGrade.max_score) >= 0.6
                           ? 'var(--color-primary)' : 'var(--color-error)' }}>
@@ -172,8 +150,9 @@ export default async function ParentDashboard() {
                 <div style={{ background: openWarnings > 0 ? '#fdecea' : 'var(--color-surface-offset)',
                   borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)' }}>
                   <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)',
-                    fontWeight: 700, marginBottom: 'var(--space-2)', textTransform: 'uppercase',
-                    letterSpacing: '.05em' }}>إنذارات مفتوحة</div>
+                    fontWeight: 700, marginBottom: 'var(--space-2)', textTransform: 'uppercase', letterSpacing: '.05em' }}>
+                    إنذارات مفتوحة
+                  </div>
                   <div style={{ fontWeight: 800, fontSize: 'var(--text-lg)', fontVariantNumeric: 'tabular-nums',
                     color: openWarnings > 0 ? 'var(--color-error)' : 'var(--color-success)' }}>
                     {openWarnings}
@@ -184,14 +163,12 @@ export default async function ParentDashboard() {
 
               {/* Links */}
               <div style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-5)',
-                paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-divider)',
-                flexWrap: 'wrap' }}>
+                paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-divider)', flexWrap: 'wrap' }}>
                 {[
-                  { label: 'الدرجات',       href: `/parent/children/${s.id}/grades`       },
-                  { label: 'الحضور',         href: `/parent/children/${s.id}/attendance`   },
-                  { label: 'الاشتراك',       href: `/parent/children/${s.id}/subscription` },
-                  { label: 'الإنذارات',      href: `/parent/children/${s.id}/warnings`     },
-                  { label: 'ملاحظات خاصة',  href: `/parent/children/${s.id}/notes`        },
+                  { label: 'الدرجات',      href: `/parent/children/${s.id}/grades`       },
+                  { label: 'الاشتراك',     href: `/parent/children/${s.id}/subscription` },
+                  { label: 'الإنذارات',    href: `/parent/children/${s.id}/warnings`     },
+                  { label: 'ملاحظات خاصة', href: `/parent/children/${s.id}/notes`        },
                 ].map(l => (
                   <Link key={l.href} href={l.href} style={{
                     fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)',
@@ -201,6 +178,7 @@ export default async function ParentDashboard() {
                   }}>{l.label}</Link>
                 ))}
               </div>
+
             </div>
           )
         })}
